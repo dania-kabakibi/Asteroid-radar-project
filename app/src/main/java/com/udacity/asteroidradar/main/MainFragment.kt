@@ -29,9 +29,6 @@ class MainFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        binding.asteroidRecycler.adapter = AsteroidAdapter(AsteroidAdapter.OnClickListener {
-            viewModel.displayPropertyDetails(it)
-        })
 
         viewModel.navigateToSelectedProperty.observe(viewLifecycleOwner, Observer {
             this.findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
@@ -39,7 +36,9 @@ class MainFragment : Fragment() {
 
         viewModel.asteroidItems.observe(viewLifecycleOwner) { asteroidList ->
             asteroidList.forEach { asteroid ->
-                Log.d("MainFragment", "Asteroid${asteroid.codename}")
+                binding.asteroidRecycler.adapter = AsteroidAdapter(AsteroidAdapter.OnClickListener {
+                    viewModel.displayPropertyDetails(it)
+                }, asteroid)
             }
         }
 

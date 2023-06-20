@@ -14,7 +14,7 @@ import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.ListAsteroidItemBinding
 
-class AsteroidAdapter(private val onClickListener: OnClickListener) :
+class AsteroidAdapter(private val onClickListener: OnClickListener, private val resAsteroid: Asteroid) :
     ListAdapter<Asteroid, AsteroidAdapter.ViewHolder>(DiffCallback) {
 
     class ViewHolder(private var binding: ListAsteroidItemBinding) :
