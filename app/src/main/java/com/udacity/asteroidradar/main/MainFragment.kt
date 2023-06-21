@@ -29,17 +29,18 @@ class MainFragment : Fragment() {
 
         binding.viewModel = viewModel
 
+        val myAdapter = AsteroidAdapter(AsteroidAdapter.OnClickListener {
+            viewModel.displayPropertyDetails(it)
+        })
+
+        binding.asteroidRecycler.adapter = myAdapter
 
         viewModel.navigateToSelectedProperty.observe(viewLifecycleOwner, Observer {
             this.findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
         })
 
         viewModel.asteroidItems.observe(viewLifecycleOwner) { asteroidList ->
-            asteroidList.forEach { asteroid ->
-                binding.asteroidRecycler.adapter = AsteroidAdapter(AsteroidAdapter.OnClickListener {
-                    viewModel.displayPropertyDetails(it)
-                }, asteroid)
-            }
+            myAdapter.submitList(asteroidList)
         }
 
         setHasOptionsMenu(true)
