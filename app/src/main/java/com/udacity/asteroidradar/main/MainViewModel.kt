@@ -1,15 +1,15 @@
 package com.udacity.asteroidradar.main
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.AsteroidApi
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.repository.AsteroidRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,10 +18,36 @@ import retrofit2.Call
 import retrofit2.Response
 import javax.security.auth.callback.Callback
 
-class MainViewModel : ViewModel() {
-    private val _asteroidItems = MutableLiveData<List<Asteroid>>()
+enum class Options { SHOW_ALL, SHOW_TODAY, SHOW_WEEK}
+
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+    private val database = getDatabase(application)
+    private val asteroidRepository = AsteroidRepository(database)
+
+    var optionMenu = MutableLiveData(Options.SHOW_ALL)
+
+    var asteroids: LiveData<List<Asteroid>?> =
+        Transformations.switchMap(optionMenu) {
+            when (it) {
+                Options.SHOW_TODAY -> asteroidRepository.asteroidOfToday
+                Options.SHOW_WEEK -> asteroidRepository.asteroidOfWeek
+                else -> asteroidRepository.allAsteroids
+            }
+        }
+
+    init {
+        //getAsteroidItems()
+        viewModelScope.launch {
+            getPicture()
+            asteroidRepository.refreshAsteroids()
+        }
+    }
+
+    //val asteroids = asteroidRepository.asteroids
+
+    /*private val _asteroidItems = MutableLiveData<List<Asteroid>>()
     val asteroidItems: LiveData<List<Asteroid>>
-        get() = _asteroidItems
+        get() = _asteroidItems*/
 
     private val _imageOfTheDay = MutableLiveData<PictureOfDay>()
     val imageOfTheDay: LiveData<PictureOfDay>
@@ -35,7 +61,21 @@ class MainViewModel : ViewModel() {
         _navigateToSelectedProperty.value = asteroid
     }
 
-    private fun getAsteroidItems() {
+    private suspend fun getPicture() {
+        withContext(Dispatchers.IO) {
+            try {
+                _imageOfTheDay.postValue(AsteroidApi.retrofitService.getPictureOfDay())
+                //Log.i("mainViewModel", "Success:${_imageOfTheDay.url}")
+            } catch (e: Exception) {
+                Log.i("mainViewModel", "Failure:${e.message}")
+            }
+        }
+    }
+
+
+}
+
+/*private fun getAsteroidItems() {
         AsteroidApi.retrofitService.getAsteroids().enqueue(object : retrofit2.Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 _asteroidItems.value =
@@ -47,22 +87,4 @@ class MainViewModel : ViewModel() {
                 //Log.i("mainViewModel", "Failure:${t.message}")
             }
         })
-    }
-
-    private suspend fun getPicture() {
-        withContext(Dispatchers.IO) {
-            try {
-                _imageOfTheDay.postValue(AsteroidApi.retrofitService.getPictureOfDay())
-                Log.i("mainViewModel", "Success:${_imageOfTheDay.value}")
-            } catch (e: Exception) {
-                Log.i("mainViewModel", "Failure:${e.message}")
-            }
-        }
-    }
-
-    init {
-        getAsteroidItems()
-        viewModelScope.launch { getPicture() }
-    }
-
-}
+    }*/

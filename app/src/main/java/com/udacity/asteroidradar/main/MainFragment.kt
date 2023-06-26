@@ -39,8 +39,12 @@ class MainFragment : Fragment() {
             this.findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
         })
 
-        viewModel.asteroidItems.observe(viewLifecycleOwner) { asteroidList ->
+        /*viewModel.asteroidItems.observe(viewLifecycleOwner) { asteroidList ->
             myAdapter.submitList(asteroidList)
+        }*/
+
+        viewModel.asteroids.observe(viewLifecycleOwner) { asteroid ->
+            myAdapter.submitList(asteroid)
         }
 
         setHasOptionsMenu(true)
@@ -53,6 +57,11 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return true
+        when (item.itemId) {
+            R.id.show_all_menu -> viewModel.optionMenu.value = Options.SHOW_WEEK
+            R.id.show_rent_menu -> viewModel.optionMenu.value = Options.SHOW_TODAY
+            R.id.show_buy_menu -> viewModel.optionMenu.value = Options.SHOW_ALL
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

@@ -13,7 +13,7 @@ object Constants {
     const val BASE_URL = "https://api.nasa.gov/"
 }
 
-private fun getNextSevenDaysFormattedDates(): ArrayList<String> {
+fun getNextSevenDaysFormattedDates(): ArrayList<String> {
     val formattedDateList = ArrayList<String>()
 
     val calendar = Calendar.getInstance()
