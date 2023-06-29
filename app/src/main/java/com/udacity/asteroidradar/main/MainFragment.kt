@@ -1,18 +1,13 @@
 package com.udacity.asteroidradar.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.R
-import com.udacity.asteroidradar.bindImageOfTheDayToImageView
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
-import kotlinx.android.synthetic.main.list_asteroid_item.*
 
 class MainFragment : Fragment() {
 

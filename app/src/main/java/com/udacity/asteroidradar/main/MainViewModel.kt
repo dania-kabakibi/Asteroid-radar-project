@@ -8,7 +8,10 @@ import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.AsteroidApi
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.database.asDatabaseModel2
+import com.udacity.asteroidradar.database.databaseToPictureOfDay
 import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.database.getDatabase2
 import com.udacity.asteroidradar.repository.AsteroidRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,11 +21,13 @@ import retrofit2.Call
 import retrofit2.Response
 import javax.security.auth.callback.Callback
 
-enum class Options { SHOW_ALL, SHOW_TODAY, SHOW_WEEK}
+enum class Options { SHOW_ALL, SHOW_TODAY, SHOW_WEEK }
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val database = getDatabase(application)
     private val asteroidRepository = AsteroidRepository(database)
+
+    private val database2 = getDatabase2(application)
 
     var optionMenu = MutableLiveData(Options.SHOW_ALL)
 
@@ -43,12 +48,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    //val asteroids = asteroidRepository.asteroids
-
-    /*private val _asteroidItems = MutableLiveData<List<Asteroid>>()
-    val asteroidItems: LiveData<List<Asteroid>>
-        get() = _asteroidItems*/
-
     private val _imageOfTheDay = MutableLiveData<PictureOfDay>()
     val imageOfTheDay: LiveData<PictureOfDay>
         get() = _imageOfTheDay
@@ -65,15 +64,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         withContext(Dispatchers.IO) {
             try {
                 _imageOfTheDay.postValue(AsteroidApi.retrofitService.getPictureOfDay())
-                //Log.i("mainViewModel", "Success:${_imageOfTheDay.url}")
+                database2.pictureDao().insertPic(asDatabaseModel2(_imageOfTheDay.value!!))
             } catch (e: Exception) {
-                Log.i("mainViewModel", "Failure:${e.message}")
+                /*val pictureDb : PictureOfDay =
+                     databaseToPictureOfDay(database2.pictureDao().getDbPicture())*/
             }
         }
     }
-
-
 }
+
+
+//val asteroids = asteroidRepository.asteroids
+
+/*private val _asteroidItems = MutableLiveData<List<Asteroid>>()
+val asteroidItems: LiveData<List<Asteroid>>
+    get() = _asteroidItems*/
 
 /*private fun getAsteroidItems() {
         AsteroidApi.retrofitService.getAsteroids().enqueue(object : retrofit2.Callback<String> {
