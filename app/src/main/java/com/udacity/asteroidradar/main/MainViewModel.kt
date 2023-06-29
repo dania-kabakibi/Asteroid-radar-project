@@ -66,8 +66,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _imageOfTheDay.postValue(AsteroidApi.retrofitService.getPictureOfDay())
                 database2.pictureDao().insertPic(asDatabaseModel2(_imageOfTheDay.value!!))
             } catch (e: Exception) {
-                /*val pictureDb : PictureOfDay =
-                     databaseToPictureOfDay(database2.pictureDao().getDbPicture())*/
+                _imageOfTheDay.postValue(databaseToPictureOfDay(database2.pictureDao().getDbPicture()))
             }
         }
     }
