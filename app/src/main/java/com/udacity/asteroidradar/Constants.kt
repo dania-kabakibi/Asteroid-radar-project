@@ -9,7 +9,7 @@ object Constants {
     const val DEFAULT_END_DATE_DAYS = 7
     val START_DATE = getNextSevenDaysFormattedDates().get(index = 0)
     val END_DATE = getNextSevenDaysFormattedDates().get(index = getNextSevenDaysFormattedDates().lastIndex)
-    const val API_KEY = "Pkw1MKy8JT3BPpDPd91Eic2bMMNrs3RVivRAmJW7"
+    const val API_KEY = "DEMO_KEY"
     const val BASE_URL = "https://api.nasa.gov/"
 }
 
