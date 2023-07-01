@@ -1,7 +1,5 @@
 package com.udacity.asteroidradar
 
-import android.icu.number.NumberFormatter.with
-import android.icu.number.NumberRangeFormatter.with
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
@@ -50,7 +48,10 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
 
 @BindingAdapter("showImageOfTheDay")
 fun bindImageOfTheDayToImageView(imageView: ImageView, url: String?) {
-    Picasso.get().load(url).networkPolicy(NetworkPolicy.OFFLINE)
+    Picasso.get()
+        .load(url)
+        .error(R.drawable.placeholder_picture_of_day)
+        .networkPolicy(NetworkPolicy.OFFLINE)
         .into(imageView, object: Callback {
             override fun onSuccess() {}
             override fun onError(exception: Exception) {

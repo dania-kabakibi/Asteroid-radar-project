@@ -1,25 +1,16 @@
 package com.udacity.asteroidradar.main
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
-import com.udacity.asteroidradar.Asteroid
-import com.udacity.asteroidradar.Constants
-import com.udacity.asteroidradar.PictureOfDay
+import androidx.work.*
+import com.udacity.asteroidradar.*
 import com.udacity.asteroidradar.api.AsteroidApi
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
-import com.udacity.asteroidradar.database.asDatabaseModel2
-import com.udacity.asteroidradar.database.databaseToPictureOfDay
-import com.udacity.asteroidradar.database.getDatabase
-import com.udacity.asteroidradar.database.getDatabase2
+import com.udacity.asteroidradar.database.*
 import com.udacity.asteroidradar.repository.AsteroidRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Response
-import javax.security.auth.callback.Callback
+import java.util.concurrent.TimeUnit
 
 enum class Options { SHOW_ALL, SHOW_TODAY, SHOW_WEEK }
 
@@ -41,10 +32,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     init {
-        //getAsteroidItems()
         viewModelScope.launch {
             getPicture()
-            asteroidRepository.refreshAsteroids()
+            scheduleWork()
+            //asteroidRepository.refreshAsteroids()
         }
     }
 
@@ -69,6 +60,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _imageOfTheDay.postValue(databaseToPictureOfDay(database2.pictureDao().getDbPicture()))
             }
         }
+    }
+
+    private fun scheduleWork() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresCharging(true)
+            .build()
+
+        val workRequest =
+            PeriodicWorkRequestBuilder<WorkerClass>(1, TimeUnit.DAYS)
+                .setConstraints(constraints)
+                .build()
+
+        WorkManager.getInstance().enqueue(workRequest)
     }
 }
 
